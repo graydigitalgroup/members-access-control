@@ -118,7 +118,7 @@ class Integration {
 			$user          = wp_get_current_user();
 			$can_user_view = members_can_user_view_post( $user->ID, $post->ID );
 
-			if ( $can_user_view ) {
+			if ( $can_user_view || ( (int) $mbr_options->login_page_id === $post->ID ) ) {
 				return;
 			}
 
@@ -147,9 +147,10 @@ class Integration {
 	public function members_is_private_page( $is_private ) {
 		global $post;
 		$mbr_options = MbrAC_Options::fetch();
+		$post_id = intval( $post->ID );
 
 		// Check if current page is the login, password rest, or forgot password pages.
-		if ( $post->ID === $mbr_options->login_page_id || $post->ID === $mbr_options->password_lost_page_id || $post->ID === $mbr_options->password_reset_page_id ) {
+		if ( $post_id === (int) $mbr_options->login_page_id || $post_id === (int) $mbr_options->password_lost_page_id || $post_id === (int) $mbr_options->password_reset_page_id ) {
 			$is_private = false;
 		}
 		return $is_private;
