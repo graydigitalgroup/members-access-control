@@ -72,6 +72,7 @@ class Integration {
 		add_filter( 'login_form_top', array( $this, 'login_form_top' ), 10, 2 );
 		add_filter( 'login_form_defaults', array( $this, 'login_form_defaults' ) );
 		add_filter( 'members_check_parent_post_permission', array( $this, 'members_check_parent_post_permission' ), 10, 3 );
+    add_filter( 'members_can_user_view_post', array( $this, 'members_can_user_view_post' ), 10, 3 );
 		add_filter( 'admin_email_check_interval', '__return_zero' );
 		add_filter( 'lostpassword_url', array( $this, 'override_lostpassword_url' ), 10, 1 );
 		add_filter( 'members_is_private_page', array( $this, 'members_is_private_page' ), 10, 1 );
@@ -155,6 +156,24 @@ class Integration {
 		}
 		return $is_private;
 	}
+
+  /**
+   * Checks to see if the page being accessed is the login page or password pages and allows access.
+   * 
+   * @param bool $can_view
+   * @param int|null $user_id
+   * @param int $post_id
+   *
+   * @return bool
+   */
+  public function members_can_user_view_post( bool $can_view, ?int $user_id, int $post_id ): bool {
+    $mbr_options = MbrAC_Options::fetch();
+
+    if ( $post_id === (int) $mbr_options->login_page_id || $post_id === (int) $mbr_options->password_lost_page_id || $post_id === (int) $mbr_options->password_reset_page_id ) {
+      $can_view = true;
+    }
+    return $can_view;
+  }
 
 	/**
 	 * Registers custom settings views with the Members plugin.
